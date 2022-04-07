@@ -1,0 +1,11 @@
+FROM node:16-alpine AS BUILD
+WORKDIR /backend
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+FROM node:16-alpine
+WORKDIR /backend
+COPY --from=BUILD /backend ./
+EXPOSE 9000
+CMD ["npm", "run", "dev"]

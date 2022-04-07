@@ -1,0 +1,37 @@
+---
+- hosts: all
+  vars:
+    appFolder: "{{ansible_env.HOME}}/weatherapp"
+
+  become: false
+  tasks:
+
+  # Install prerequisites
+  - name: Install nodejs, npm, git
+    become: yes
+    apt:
+      name:
+        - nodejs
+        - npm
+        - git
+      update_cache: yes
+      state: present
+  
+  # Clone GitHub repo
+  - name: Git Clone
+    git:
+      repo: https://github.com/vesana/docker-compose-ansible.git
+      dest: "{{appFolder}}"
+      
+  # Run npm install
+  - name: Install backend packages with npm
+    npm:
+      path: "{{appFolder}}/backend"
+  - name: Install frontend packages with npm
+    npm:
+      path: "{{appFolder}}/frontend"
+  
+  # Start the application
+  - name: Start the weather service
+    community.docker.docker_compose:
+      project_src: "{{appFolder}}"
